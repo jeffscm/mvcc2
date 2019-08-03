@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using MVC.Proxy;
 using UnityEngine;
+#if VUFORIA
 using Vuforia;
 
 public class ImageTracker : ImageTrackerBase<NOTIFYVUFORIA>
@@ -35,3 +36,4 @@ public class ImageTracker : ImageTrackerBase<NOTIFYVUFORIA>
     }
 
 }
+#endif

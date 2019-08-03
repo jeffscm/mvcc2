@@ -266,6 +266,19 @@ public class App
         }
     }
 
+    public bool IsCurrentView<T>(long controllerId) where T : UIView
+    {
+        foreach (var view in uiviewList)
+        {
+            Debug.Log($"IsCurrent: {view.Value.gameObject.name} {view.Value.IsCurrent}");
+            if (view.Value != null && (view.Value.controllerId == controllerId || controllerId == -1) && view.Value.IsCurrent)
+            {
+                return view.Key == typeof(T);
+            }
+        }
+        return false;
+    }
+
     public List<UIView> GetViews(long controllerId)
     {
         var response = new List<UIView>();
@@ -361,6 +374,7 @@ public class MVCC
 
 public interface IUIView
 {
+    bool IsCurrent { get; set; }
     void Present();
     void Dismiss();
     void Hide();

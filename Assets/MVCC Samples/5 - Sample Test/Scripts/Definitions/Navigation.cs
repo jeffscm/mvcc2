@@ -30,10 +30,10 @@ public class Navigation : AppMonoController
         {
             case NOTIFYNAV.GOTO_LOGIN:
 
-                if (app.GetCurrentViewController(CONTROLLER_TYPE.NAV).GetType() != typeof(A))
-                {
-                    return false;
-                }
+                //if (app.GetCurrentViewController(CONTROLLER_TYPE.NAV).GetType() != typeof())
+                //{
+                //    return false;
+                //}
 
                 break;
             case NOTIFYNAV.SHOW_TOPMENU:

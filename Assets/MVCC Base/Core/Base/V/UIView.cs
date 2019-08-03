@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class UIView : AppElement, IUIView
 {
+    public bool IsCurrent { get; set; } = false;
+
     [HideInInspector]
     [SerializeField]
     public long controllerId;
@@ -11,6 +14,8 @@ public class UIView : AppElement, IUIView
     [HideInInspector]
     [SerializeField]
     public NavAnimate navAnimate;
+
+    public Action OnPresent, OnDismiss;
 
     public virtual void Awake()
     {
@@ -21,18 +26,32 @@ public class UIView : AppElement, IUIView
 
     public void Present()
     {
+        Debug.Log($"This UIView {IsCurrent}");
         app.HideViews(this, controllerId);
-        navAnimate?.AnimateIn();
+        navAnimate?.AnimateIn( () => {
+            OnPresent?.Invoke();
+        });
+        IsCurrent = true;
+
     }
 
     public void Dismiss()
     {
+        OnDismiss?.Invoke();
         navAnimate?.AnimateOut();
+        IsCurrent = false;
     }
 
     public void Hide()
     {
         navAnimate?.AnimateOutInstant();
+        IsCurrent = false;
+        OnDismiss?.Invoke();
+    }
+
+    private void OnDestroy()
+    {
+        IsCurrent = false;
     }
 
     public virtual void SetModel() { }

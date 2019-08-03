@@ -12,6 +12,8 @@ public class UI3DView : AppElement, IUIView
     [SerializeField]
     public Nav3DAnimate navAnimate;
 
+    public bool IsCurrent { get; set; }
+
     public virtual void Awake()
     {
         Debug.Log("Reg View3d:" + name);
@@ -23,16 +25,19 @@ public class UI3DView : AppElement, IUIView
     public void Present()
     {
         navAnimate?.AnimateIn();
+        IsCurrent = true;
     }
 
     public void Dismiss()
     {
         navAnimate?.AnimateOut();
+        IsCurrent = false;
     }
 
     public void Hide()
     {
         navAnimate?.AnimateOutInstant();
+        IsCurrent = false;
     }
 
     public virtual void SetModel() { }

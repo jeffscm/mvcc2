@@ -71,7 +71,7 @@ public class PressHandler<T> : MonoBehaviour , IPointerDownHandler, IPointerUpHa
     public void OnPointerDown(PointerEventData eventData)
     {
 
-        if (_anim != null && useFade) _anim.FadeOut(cg, null, 0.6f);
+        //if (_anim != null && useFade) _anim.FadeOut(cg, null, 0.6f);
 
 
         if (pushToTalk)
@@ -103,7 +103,7 @@ public class PressHandler<T> : MonoBehaviour , IPointerDownHandler, IPointerUpHa
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        if (_anim != null && useFade) _anim.FadeIn(cg);
+        //if (_anim != null && useFade) _anim.FadeIn(cg);
 
 
         if (pushToTalk)
