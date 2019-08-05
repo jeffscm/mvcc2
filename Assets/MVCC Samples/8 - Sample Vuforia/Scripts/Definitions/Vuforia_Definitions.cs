@@ -58,5 +58,8 @@ namespace VuforiaSample
         VUFORIA_UI_CLICK_CANCEL,
         VUFORIA_UI_CLICK_DRAWER,
         VUFORIA_UI_CLICK_DRAWER_CLOSE,
+        VUFORIA_OBJ_SELECTED,
+        VUFORIA_OBJ_SELECTED_CLOSE,
+        VUFORIA_OBJ_EDIT,
     };
 }

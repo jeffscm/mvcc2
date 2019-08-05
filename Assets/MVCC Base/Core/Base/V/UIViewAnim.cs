@@ -14,44 +14,57 @@ public class UIViewAnim : AppElement
 
     private void Awake()
     {
-        uiView.OnDismiss += () =>
+        if (uiView != null)
         {
-            switch (animateOut.animateType)
+            uiView.OnDismiss += () =>
             {
-                case NAVANIM.FADE:
-                    MVCC.animate.FadeOut(cg, animateOut, null);
-                    break;
-                case NAVANIM.MOVELEFT:
-                    MVCC.animate.MoveXOut(cg, deactivateOnOut, animateOut, false, null);
-                    break;
-                case NAVANIM.MOVERIGHT:
-                    MVCC.animate.MoveXOut(cg, deactivateOnOut, animateOut, true, null);
-                    break;
-                case NAVANIM.MOVEBOTTOM:
-                    MVCC.animate.MoveYOut(cg, deactivateOnOut, animateOut, true, null);
-                    break;
-                case NAVANIM.MOVEUP:
-                    MVCC.animate.MoveYOut(cg, deactivateOnOut, animateOut, false, null);
-                    break;
-            }
-        };
+                DoAnimateOut();
+            };
 
-        uiView.OnPresent += () =>
-        {
-            switch (animateIn.animateType)
+            uiView.OnPresent += () =>
             {
-                case NAVANIM.FADE:
-                    MVCC.animate.FadeIn(cg, animateIn, null);
-                    break;
-                case NAVANIM.MOVEBOTTOM:
-                case NAVANIM.MOVEUP:
-                    MVCC.animate.MoveYIn(cg, animateIn, null);
-                    break;
-                case NAVANIM.MOVELEFT:
-                case NAVANIM.MOVERIGHT:
-                    MVCC.animate.MoveXIn(cg, animateIn, null);
-                    break;
-            }
-        };
+                DoAnimateIn();
+            };
+        }
+    }
+
+    public void DoAnimateIn()
+    {
+        switch (animateIn.animateType)
+        {
+            case NAVANIM.FADE:
+                MVCC.animate.FadeIn(cg, animateIn, null);
+                break;
+            case NAVANIM.MOVEBOTTOM:
+            case NAVANIM.MOVEUP:
+                MVCC.animate.MoveYIn(cg, animateIn, null);
+                break;
+            case NAVANIM.MOVELEFT:
+            case NAVANIM.MOVERIGHT:
+                MVCC.animate.MoveXIn(cg, animateIn, null);
+                break;
+        }
+    }
+
+    public void DoAnimateOut()
+    {
+        switch (animateOut.animateType)
+        {
+            case NAVANIM.FADE:
+                MVCC.animate.FadeOut(cg, animateOut, null);
+                break;
+            case NAVANIM.MOVELEFT:
+                MVCC.animate.MoveXOut(cg, deactivateOnOut, animateOut, false, null);
+                break;
+            case NAVANIM.MOVERIGHT:
+                MVCC.animate.MoveXOut(cg, deactivateOnOut, animateOut, true, null);
+                break;
+            case NAVANIM.MOVEBOTTOM:
+                MVCC.animate.MoveYOut(cg, deactivateOnOut, animateOut, true, null);
+                break;
+            case NAVANIM.MOVEUP:
+                MVCC.animate.MoveYOut(cg, deactivateOnOut, animateOut, false, null);
+                break;
+        }
     }
 }

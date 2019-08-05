@@ -17,12 +17,16 @@ namespace VuforiaSample
             Debug.Log("AR View active");
             base.OnNavigationEnter();
 
+            GroundPlaneProxy.OnStartARGroundPlane += OnStartARGroundPlane;
+            GroundPlaneProxy.OnStatusChange += OnScanState;
+
 
             if (GroundPlaneProxy.TrackingStatusIsTrackedAndNormal)
             {
                 if (string.IsNullOrEmpty(app.model.GetModel<VuforiaStateModel>().currentPlaceID))
                 {
-                    app.GetView<ARFreeView>().Present();
+                    // this is wrong...   
+                    app.SwitchNavController<SelectionController>(CONTROLLER_TYPE.NAV);
                 }
                 else
                 {
@@ -31,15 +35,17 @@ namespace VuforiaSample
             }
             else
             {
-                app.GetView<ARScanView>().Present();
+                app.SwitchNavController<ScanNavController>(CONTROLLER_TYPE.NAV);
             }
 
-            GroundPlaneProxy.OnStartARGroundPlane += OnStartARGroundPlane;
-            GroundPlaneProxy.OnScanStatus += OnScanState;
         }
         public override void OnNavigationExit()
         {
             base.OnNavigationExit();
+
+            GroundPlaneProxy.OnStartARGroundPlane -= OnStartARGroundPlane;
+            GroundPlaneProxy.OnStatusChange -= OnScanState;
+
             app.HideViews(this.controllerId);
         }
 
@@ -51,33 +57,15 @@ namespace VuforiaSample
                
                 case NOTIFYVUFORIA.VUFORIA_PLACE_ON_GROUND:
                     app.model.GetModel<VuforiaStateModel>().currentPlaceID = string.Empty;
-                    app.GetView<ARFreeView>().Present();
+                    app.SwitchNavController<SelectionController>(CONTROLLER_TYPE.NAV);
                     break;
+
                 case NOTIFYVUFORIA.VUFORIA_CANCEL_PLACEMENT:
                     app.model.GetModel<VuforiaStateModel>().currentPlaceID = string.Empty;
                     app.SwitchNavController<SelectionController>(CONTROLLER_TYPE.NAV);
                     break;
 
-                case NOTIFYVUFORIA.VUFORIA_HIT_TEST:
-                    var up = (bool)p_data[0];
-                    if (up)
-                    {
-                        _dragEnabled = false;
-                    }
-                    else
-                    {
-                        if (GroundPlaneProxy.TrackingStatusIsTrackedAndNormal)
-                        {
-                            if (string.IsNullOrEmpty(app.model.GetModel<VuforiaStateModel>().currentPlaceID))
-                            {
-                                if (app.IsCurrentView<ARFreeView>(-1) || app.IsCurrentView<SelectView>(-1))
-                                {
-                                    _dragEnabled = true;
-                                }
-                            }
-                        }
-                    }                   
-                    break;
+                
                 case NOTIFYVUFORIA.VUFORIA_UI_CLICK_BACK:
 
                     app.SwitchNavController<SelectionController>(CONTROLLER_TYPE.NAV);
@@ -92,23 +80,12 @@ namespace VuforiaSample
             return base.OnNotification(p_event_path, p_target, p_data);
         }
 
-        void OnScanState(SCANSTATUS state)
+        void OnScanState(bool state)
         {
             Debug.Log($"Status Scan {state}");
-            if (state == SCANSTATUS.SCANNED)
+            if (!state)
             {
-                if (string.IsNullOrEmpty(app.model.GetModel<VuforiaStateModel>().currentPlaceID))
-                {
-                    app.GetView<ARFreeView>().Present();
-                }
-                else
-                {
-                    app.GetView<ARPlaceView>().Present();
-                }
-            }
-            else
-            {
-                app.GetView<ARScanView>().Present();
+                app.SwitchNavController<ScanNavController>(CONTROLLER_TYPE.NAV);
             }
         }
 
@@ -118,61 +95,7 @@ namespace VuforiaSample
         }
 
 
-        GameObject ReturnClickedObject(out RaycastHit hit)
-        {
-            GameObject target = null;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray.origin, ray.direction * 10, out hit))
-            {
-                target = hit.collider.gameObject;
-            }
-            return target;
-        }
-
-        bool _dragEnabled = false;
-
-       
-
-        public GameObject target;
-        bool isMouseDrag = false;
-        Vector3 offset;
-        Vector3 screenPosition;
-        private void Update()
-        {
-            if (!_dragEnabled) return;
-
-            if (Input.GetMouseButtonDown(0))
-            {
-                RaycastHit hitInfo;
-                target = ReturnClickedObject(out hitInfo);
-                if (target != null)
-                {
-                    isMouseDrag = true;
-                    Debug.Log("target position :" + target.transform.position);
-                    //Convert world position to screen position.
-                    screenPosition = Camera.main.WorldToScreenPoint(target.transform.position);
-                    offset = target.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPosition.z));
-                }
-            }
-
-            if (Input.GetMouseButtonUp(0))
-            {
-                isMouseDrag = false;
-            }
-
-            if (isMouseDrag)
-            {
-                //track mouse position.
-                Vector3 currentScreenSpace = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPosition.z);
-
-                //convert screen position to world position with offset changes.
-                Vector3 currentPosition = Camera.main.ScreenToWorldPoint(currentScreenSpace) + offset;
-
-                //It will update target gameobject's current postion.
-                currentPosition.y = target.transform.position.y;
-                target.transform.position = currentPosition;
-            }
-        }
+     
 
     }
 }

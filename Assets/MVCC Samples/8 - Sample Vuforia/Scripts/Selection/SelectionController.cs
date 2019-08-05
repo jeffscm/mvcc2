@@ -22,6 +22,8 @@ namespace VuforiaSample
             //if (_isFirstTime) return;
             _isFirstTime = false;
             app.GetView<SelectView>().Present();
+            app.GetView<SelectView>().editAnim.DoAnimateOut();
+            app.GetView<SelectView>().selectAnim.DoAnimateIn();
         }
 
         public override void OnNavigationExit()
@@ -46,6 +48,27 @@ namespace VuforiaSample
                 case NOTIFYVUFORIA.VUFORIA_UI_CLICK_DRAWER_CLOSE:
                     app.GetView<SelectView>().Present();
                     break;
+                case NOTIFYVUFORIA.VUFORIA_OBJ_SELECTED:
+                    app.GetView<SelectEditView>().Present();
+                    break;
+
+                case NOTIFYVUFORIA.VUFORIA_OBJ_SELECTED_CLOSE:
+                    app.GetView<SelectView>().Present();
+                    break; 
+
+                 case NOTIFYVUFORIA.VUFORIA_OBJ_EDIT:
+                    if (p_data != null && p_data.Length > 0)
+                    {
+                        app.GetView<SelectView>().selectAnim.DoAnimateOut();
+                        app.GetView<SelectView>().editAnim.DoAnimateIn();
+                    }
+                    else
+                    {
+                        app.GetView<SelectView>().editAnim.DoAnimateOut();
+                        app.GetView<SelectView>().selectAnim.DoAnimateIn();
+                    }
+                    break; 
+
             }
             return true;
         }

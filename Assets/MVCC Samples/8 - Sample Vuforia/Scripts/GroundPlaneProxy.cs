@@ -10,16 +10,14 @@ using UnityEngine.UI;
 namespace VuforiaSample
 {
     public enum PLACEMENT { NOTRACKING, PLACING, NORMAL };
-    public enum SCANSTATUS { NONE, SCANNING, SCANNED };
+
     public class GroundPlaneProxy : AppMonoController
     {
 
-        public static Action<TrackableBehaviour.Status> OnStatusChange;
+        public static Action<bool> OnStatusChange;
         public static Action OnDetectPositionOnGround;
         public static Action<bool> OnStartARGroundPlane;
         public static Action<bool> OnARPlacingStatusChange;
-
-        public static Action<SCANSTATUS> OnScanStatus;
 
         static TrackableBehaviour.Status StatusCached = TrackableBehaviour.Status.NO_POSE;
         static TrackableBehaviour.StatusInfo StatusInfoCached = TrackableBehaviour.StatusInfo.UNKNOWN;
@@ -171,8 +169,12 @@ namespace VuforiaSample
 
             StatusCached = status;
             StatusInfoCached = statusInfo;
-
             _vuforiaState.state = StatusCached;
+
+            OnStatusChange?.Invoke(TrackingStatusIsTrackedAndNormal);
+
+            baseGrounds.SetActive(TrackingStatusIsTrackedAndNormal);
+
 
             // If the timer is running and the status is no longer Relocalizing, then stop the timer
             if (statusInfo != TrackableBehaviour.StatusInfo.RELOCALIZING && this.timer.Enabled)
@@ -183,13 +185,10 @@ namespace VuforiaSample
             switch (statusInfo)
             {
                 case TrackableBehaviour.StatusInfo.NORMAL:
-                    OnScanStatus?.Invoke(SCANSTATUS.SCANNED);
-                    baseGrounds.SetActive(true);
                     break;
                 case TrackableBehaviour.StatusInfo.UNKNOWN:
                     break;
                 case TrackableBehaviour.StatusInfo.INITIALIZING:
-                    OnScanStatus?.Invoke(SCANSTATUS.SCANNING);
                     baseGrounds.SetActive(false);
                     break;
                 case TrackableBehaviour.StatusInfo.EXCESSIVE_MOTION:
@@ -199,7 +198,6 @@ namespace VuforiaSample
                 case TrackableBehaviour.StatusInfo.INSUFFICIENT_LIGHT:
                     break;
                 case TrackableBehaviour.StatusInfo.RELOCALIZING:
-                    OnScanStatus?.Invoke(SCANSTATUS.SCANNING);
                     baseGrounds.SetActive(false);
                     // Start a 10 second timer to Reset Device Tracker
                     if (!this.timer.Enabled)

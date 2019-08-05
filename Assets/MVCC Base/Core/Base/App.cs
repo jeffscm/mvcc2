@@ -134,9 +134,9 @@ public class App
         {
             OnNavLog?.Invoke(temp);
 
-            temp.OnNavigationEnter();
             _currentNav[controllerType] = null;
             _currentNav[temp.controllerType] = temp;
+            temp.OnNavigationEnter();
         }
         else
         {

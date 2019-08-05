@@ -6,6 +6,7 @@ namespace VuforiaSample
 {
     public class SelectView : UIView
     {
-       
+        public UIViewAnim selectAnim;
+        public UIViewAnim editAnim;
     }
 }

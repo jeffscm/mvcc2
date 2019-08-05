@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace VuforiaSample
 {
-    public class ARFreeView : UIView
+    public class SelectEditView : UIView
     {
-       
     }
 }

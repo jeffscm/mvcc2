@@ -11,18 +11,17 @@ public class NavAnimate : MonoBehaviour, INavAnimate
 
     public AnimateSettings animateIn;
     public AnimateSettings animateOut;
-
-
+    public List<MediaQueryItem> mediaQuery = new List<MediaQueryItem>();
 
     public CanvasGroup cg;
 
     public bool deactivateOnOut = false;
-
     public bool startOffScreen = false;
 
-    public bool doSetNewOffset = false;
-
-    public Vector2 offsetRectAdd;
+    void Awake()
+    {
+        ScreenRotation.OnRotationChange += ProcessMediaQuery;
+    }
 
     public virtual void AnimateIn(Action onComplete = null)
     {
@@ -73,19 +72,8 @@ public class NavAnimate : MonoBehaviour, INavAnimate
 
     public virtual void Setup(Action onComplete = null)
     {
-#if UNITY_IOS
-        if (doSetNewOffset)
-        {
-#if !IPAD
-            var rectTrans = transform as RectTransform;
-            if (Device.generation.ToString().IndexOf("iPad") > -1)
-#endif
-            {
-                rectTrans.offsetMin = new Vector2(rectTrans.offsetMin.x + offsetRectAdd.x, rectTrans.offsetMin.y + offsetRectAdd.y);
-                rectTrans.offsetMax = new Vector2(rectTrans.offsetMax.x - offsetRectAdd.x, rectTrans.offsetMax.y - offsetRectAdd.y);
-            }
-        }   
-#endif
+
+        ProcessMediaQuery(ScreenRotation.CurrentRotation);
 
         if (startOffScreen)
         {
@@ -127,7 +115,22 @@ public class NavAnimate : MonoBehaviour, INavAnimate
         onComplete?.Invoke();
     }
 
+    void ProcessMediaQuery(DeviceOrientation newOrientation)
+    {
+        var rectTrans = transform as RectTransform;
 
+        foreach (var mq in mediaQuery)
+        {
+            if (mq.orientation == DeviceOrientation.Unknown || newOrientation == mq.orientation)
+            {
+                if (mq.useOffset && ( string.IsNullOrEmpty(mq.searchGeneration) || Device.generation.ToString().ToLower().IndexOf(mq.searchGeneration.ToLower()) > -1))
+                {
+                    rectTrans.offsetMin = new Vector2(rectTrans.offsetMin.x + mq.offset.x, rectTrans.offsetMin.y + mq.offset.y);
+                    rectTrans.offsetMax = new Vector2(rectTrans.offsetMax.x - mq.offset.x, rectTrans.offsetMax.y - mq.offset.y);
+                }
+            }
+        }
+    }
 }
 
 
@@ -140,4 +143,14 @@ public class AnimateSettings
     public float time = 0.35f;
     public float delay = 0f;
     public float fade = 0f;
+}
+
+[Serializable] 
+public class MediaQueryItem
+{
+    public DeviceOrientation orientation = DeviceOrientation.Unknown;
+    public float screenRatio = -1;
+    public string searchGeneration = string.Empty;
+    public Vector2 offset;
+    public bool useOffset = false;
 }
