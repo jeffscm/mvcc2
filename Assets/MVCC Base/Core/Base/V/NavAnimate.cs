@@ -18,8 +18,11 @@ public class NavAnimate : MonoBehaviour, INavAnimate
     public bool deactivateOnOut = false;
     public bool startOffScreen = false;
 
+    Vector2 min, max;
+    bool _hasMinMax = false;
     void Awake()
     {
+        SetInitialMinMax();
         ScreenRotation.OnRotationChange += ProcessMediaQuery;
     }
 
@@ -72,7 +75,7 @@ public class NavAnimate : MonoBehaviour, INavAnimate
 
     public virtual void Setup(Action onComplete = null)
     {
-
+        SetInitialMinMax();
         ProcessMediaQuery(ScreenRotation.CurrentRotation);
 
         if (startOffScreen)
@@ -125,11 +128,22 @@ public class NavAnimate : MonoBehaviour, INavAnimate
             {
                 if (mq.useOffset && ( string.IsNullOrEmpty(mq.searchGeneration) || Device.generation.ToString().ToLower().IndexOf(mq.searchGeneration.ToLower()) > -1))
                 {
-                    rectTrans.offsetMin = new Vector2(rectTrans.offsetMin.x + mq.offset.x, rectTrans.offsetMin.y + mq.offset.y);
-                    rectTrans.offsetMax = new Vector2(rectTrans.offsetMax.x - mq.offset.x, rectTrans.offsetMax.y - mq.offset.y);
+                    rectTrans.offsetMin = new Vector2(min.x + mq.offset.x, min.y + mq.offset.y);
+                    rectTrans.offsetMax = new Vector2(max.x - mq.offset.x, max.y - mq.offset.y);
                 }
             }
         }
+    }
+
+    void SetInitialMinMax()
+    {
+        if (_hasMinMax) return;
+
+        _hasMinMax = true;
+        var rectTrans = transform as RectTransform;
+        min = rectTrans.offsetMin;
+        max = rectTrans.offsetMax;
+
     }
 }
 
