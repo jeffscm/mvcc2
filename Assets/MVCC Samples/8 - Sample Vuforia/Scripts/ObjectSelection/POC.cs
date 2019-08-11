@@ -9,6 +9,17 @@ public class POC : AppElement
     public GameObject[] defaults;
     public AnchorBehaviour stage;
 
+    public GameObject RealObject
+    {
+        get
+        {
+            return defaults[1];
+        }
+    }
+
+
+    public Renderer renderChangeColor;
+
     bool _isPlaced = false;
     public bool IsPlaced { get { return _isPlaced; } }
        

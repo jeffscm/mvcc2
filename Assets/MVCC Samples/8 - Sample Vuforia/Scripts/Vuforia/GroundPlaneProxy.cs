@@ -17,7 +17,6 @@ namespace VuforiaSample
         public static Action<bool> OnStatusChange;
         public static Action OnDetectPositionOnGround;
         public static Action<bool> OnStartARGroundPlane;
-        public static Action<bool> OnARPlacingStatusChange;
 
         static TrackableBehaviour.Status StatusCached = TrackableBehaviour.Status.NO_POSE;
         static TrackableBehaviour.StatusInfo StatusInfoCached = TrackableBehaviour.StatusInfo.UNKNOWN;
@@ -50,7 +49,7 @@ namespace VuforiaSample
 
         public PlaneFinderBehaviour planeFinder;
         public ContentPositioningBehaviour contentPositioningBehaviour;
-        public POC currentGroundStage;
+
         public GameObject baseGrounds;
 
         //public EventSystem eventSystem; // commented out as not using TAP to Place
@@ -99,7 +98,6 @@ namespace VuforiaSample
             _interactionState.RegisterEvent(PLACEMENT.NOTRACKING, () =>
             {
                 Debug.Log("Placing...");
-                OnARPlacingStatusChange?.Invoke(false);
             });
 
             _interactionState.RegisterEvent(PLACEMENT.NORMAL, () =>
@@ -171,10 +169,16 @@ namespace VuforiaSample
             StatusInfoCached = statusInfo;
             _vuforiaState.state = StatusCached;
 
-            OnStatusChange?.Invoke(TrackingStatusIsTrackedAndNormal);
-
-            baseGrounds.SetActive(TrackingStatusIsTrackedAndNormal);
-
+            var currentStatus = TrackingStatusIsTrackedAndNormal;
+            CancelInvoke(nameof(ProcessCurrentStatus));
+            if (!TrackingStatusIsTrackedAndNormal)
+            {
+                ProcessCurrentStatus();
+            }
+            else
+            {
+                Invoke(nameof(ProcessCurrentStatus), 4f);
+            }
 
             // If the timer is running and the status is no longer Relocalizing, then stop the timer
             if (statusInfo != TrackableBehaviour.StatusInfo.RELOCALIZING && this.timer.Enabled)
@@ -189,7 +193,6 @@ namespace VuforiaSample
                 case TrackableBehaviour.StatusInfo.UNKNOWN:
                     break;
                 case TrackableBehaviour.StatusInfo.INITIALIZING:
-                    baseGrounds.SetActive(false);
                     break;
                 case TrackableBehaviour.StatusInfo.EXCESSIVE_MOTION:
                     break;
@@ -198,7 +201,6 @@ namespace VuforiaSample
                 case TrackableBehaviour.StatusInfo.INSUFFICIENT_LIGHT:
                     break;
                 case TrackableBehaviour.StatusInfo.RELOCALIZING:
-                    baseGrounds.SetActive(false);
                     // Start a 10 second timer to Reset Device Tracker
                     if (!this.timer.Enabled)
                     {
@@ -208,6 +210,12 @@ namespace VuforiaSample
                 default:
                     break;
             }
+        }
+
+        void ProcessCurrentStatus()
+        {
+            OnStatusChange?.Invoke(TrackingStatusIsTrackedAndNormal);
+            baseGrounds.SetActive(TrackingStatusIsTrackedAndNormal);
         }
 
         void OnTrackerStarted()
@@ -275,9 +283,6 @@ namespace VuforiaSample
 
         void ResetTrackers()
         {
-
-            OnARPlacingStatusChange?.Invoke(false);
-
             Debug.Log("ResetTrackers() called.");
 
             this.smartTerrain = TrackerManager.Instance.GetTracker<SmartTerrain>();
@@ -295,7 +300,6 @@ namespace VuforiaSample
 
             if (_interactionState.state == PLACEMENT.PLACING)
             {
-                OnARPlacingStatusChange?.Invoke(true);
                 if (contentPositioningBehaviour.AnchorStage != null)
                 {
                     this.contentPositioningBehaviour.PositionContentAtPlaneAnchor(result);
@@ -368,11 +372,12 @@ namespace VuforiaSample
 
                     var prefab = Resources.Load<POC>("objs/" + p_data[0].ToString());
 
-                    currentGroundStage = Instantiate(prefab, baseGrounds.transform) as POC;
+                    var temp = Instantiate(prefab, baseGrounds.transform) as POC;
+                    app.model.GetModel<VuforiaStateModel>().currentSelection = temp;
 
-                    this.contentPositioningBehaviour.AnchorStage = currentGroundStage.stage;
+                    this.contentPositioningBehaviour.AnchorStage = temp.stage;
 
-                    currentGroundStage.StartPlacement();
+                    temp.StartPlacement();
 
                     _interactionState.state = PLACEMENT.PLACING;
 
@@ -381,18 +386,17 @@ namespace VuforiaSample
                 case NOTIFYVUFORIA.VUFORIA_PLACE_ON_GROUND:
 
                     _interactionState.state = PLACEMENT.NORMAL;
-                    if (currentGroundStage != null)
-                    {
-                        currentGroundStage.PlaceReal();
-                    }
+                    app.model.GetModel<VuforiaStateModel>().currentSelection.PlaceReal();
+
                     break;
                 case NOTIFYVUFORIA.VUFORIA_CANCEL_PLACEMENT:
 
-                    if (currentGroundStage != null)
+                    if (app.model.GetModel<VuforiaStateModel>().currentSelection != null)
                     {
-                        if (!currentGroundStage.IsPlaced)
+                        if (!app.model.GetModel<VuforiaStateModel>().currentSelection.IsPlaced)
                         {
-                            Destroy(currentGroundStage.gameObject);
+                            Destroy(app.model.GetModel<VuforiaStateModel>().currentSelection.gameObject);
+                            app.model.GetModel<VuforiaStateModel>().currentSelection = null;
                         }
                     }
 

@@ -5,7 +5,7 @@ using System;
 
 public interface IAnimate
 {
-    void FadeOut(CanvasGroup cg, AnimateSettings settings, Action onComplete = null);
+    void FadeOut(CanvasGroup cg, bool onOut, AnimateSettings settings, Action onComplete = null);
     void FadeIn(CanvasGroup cg, AnimateSettings settings, Action onComplete = null);
 
     void MoveXIn(CanvasGroup cg, AnimateSettings settings, Action onComplete = null);
@@ -18,4 +18,8 @@ public interface IAnimate
 
     void MoveX(CanvasGroup cg, float add, Action onComplete = null, float speed = 0.35f, float delay = 0.1f);
     void MoveY(CanvasGroup cg, float add, Action onComplete = null, float speed = 0.35f, float delay = 0.1f);
+
+    void ScaleOut(CanvasGroup cg, bool onOut, AnimateSettings settings, Action onComplete = null);
+    void ScaleIn(CanvasGroup cg, AnimateSettings settings, Action onComplete = null);
+
 }

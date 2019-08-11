@@ -6,12 +6,6 @@ namespace VuforiaSample
     public class ARNavController : UIViewController
     {
 
-        private void Start()
-        {
-
-
-
-        }
         public override void OnNavigationEnter()
         {
             Debug.Log("AR View active");
@@ -37,7 +31,9 @@ namespace VuforiaSample
             {
                 app.SwitchNavController<ScanNavController>(CONTROLLER_TYPE.NAV);
             }
-
+#if UNITY_EDITOR
+            //Invoke(nameof(Test), 2f);
+#endif
         }
         public override void OnNavigationExit()
         {
@@ -93,9 +89,12 @@ namespace VuforiaSample
         {
 
         }
-
-
-     
+#if UNITY_EDITOR
+        void Test()
+        {
+            app.Notify(NOTIFYVUFORIA.VUFORIA_PLACE_ON_GROUND);
+        }
+#endif
 
     }
 }

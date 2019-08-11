@@ -6,7 +6,7 @@ using System;
 public class MyAnim : IAnimate
 {
 
-    public void FadeOut(CanvasGroup cg, AnimateSettings settings, Action onComplete = null) { }
+    public void FadeOut(CanvasGroup cg, bool onOut, AnimateSettings settings, Action onComplete = null) { }
     public void FadeIn(CanvasGroup cg, AnimateSettings settings, Action onComplete = null) { }
 
 
@@ -39,4 +39,8 @@ public class MyAnim : IAnimate
 
     public void MoveX(CanvasGroup cg, float add, Action onComplete = null, float speed = 0.35f, float delay = 0.1f) { }
     public void MoveY(CanvasGroup cg, float add, Action onComplete = null, float speed = 0.35f, float delay = 0.1f) { }
+
+    public void ScaleOut(CanvasGroup cg, bool onOut, AnimateSettings settings, Action onComplete = null) { }
+    public void ScaleIn(CanvasGroup cg, AnimateSettings settings, Action onComplete = null) { }
+
 }

@@ -81,6 +81,7 @@ MonoBehaviour:
   - {fileID: 7956779955186539370}
   - {fileID: 4316258058307074944}
   stage: {fileID: 3024806336066042539}
+  renderChangeColor: {fileID: 4301078172398518524}
 --- !u!1 &4316258058307074944
 GameObject:
   m_ObjectHideFlags: 0
@@ -99,7 +100,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4318325648090895586
 Transform:
   m_ObjectHideFlags: 0

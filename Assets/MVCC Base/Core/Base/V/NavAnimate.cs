@@ -50,7 +50,7 @@ public class NavAnimate : MonoBehaviour, INavAnimate
         switch (animateOut.animateType)
         {
             case NAVANIM.FADE:
-                MVCC.animate.FadeOut(cg, animateOut, onComplete);
+                MVCC.animate.FadeOut(cg, deactivateOnOut, animateOut, onComplete);
                 break;
             case NAVANIM.MOVELEFT:
                 MVCC.animate.MoveXOut(cg, deactivateOnOut, animateOut, false, onComplete);
@@ -156,7 +156,13 @@ public class AnimateSettings
     public LeanTweenType tweenType = LeanTweenType.easeInOutQuad;
     public float time = 0.35f;
     public float delay = 0f;
+
+    public bool useFade = false;
     public float fade = 0f;
+
+    //public bool useScale = false;
+    public float scale = 0f;
+    public bool cgActive = true;
 }
 
 [Serializable] 

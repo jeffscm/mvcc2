@@ -6,11 +6,8 @@ using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using System;
 
-public class PressHandler<T> : MonoBehaviour , IPointerDownHandler, IPointerUpHandler {
-
-    
-    public Animate _anim;
-
+public class PressHandler<T> : MonoBehaviour , IPointerDownHandler, IPointerUpHandler 
+{
     public bool useFade = false;
 
     public bool Instant = false;
@@ -42,6 +39,14 @@ public class PressHandler<T> : MonoBehaviour , IPointerDownHandler, IPointerUpHa
 
     UIResponder<T> _responder;
 
+    [Space(10)]
+    [Header("Is this a selection button?")]
+    public bool useColor;
+    public Color defaultColor;
+    public Color selectedColor;
+    public Image imageSelection;
+
+
     void OnEnable()
     {
         _responder = GetComponentInParent<UIResponder<T>>();
@@ -55,6 +60,11 @@ public class PressHandler<T> : MonoBehaviour , IPointerDownHandler, IPointerUpHa
     {
         if (PressManager.instance.CanClick)
         {           
+            if (useColor)
+            {
+                imageSelection.color = selectedColor;
+            }
+
             if (userFirstResponder)
             {
                 PressManager.instance.ProcessNotify(_responder.reponderNotify, data, extraParams);
@@ -71,8 +81,10 @@ public class PressHandler<T> : MonoBehaviour , IPointerDownHandler, IPointerUpHa
     public void OnPointerDown(PointerEventData eventData)
     {
 
-        //if (_anim != null && useFade) _anim.FadeOut(cg, null, 0.6f);
-
+        if (useFade) MVCC.animate.FadeOut(cg, false, new AnimateSettings() {
+            time = 0.1f,
+            fade = 0.5f
+        });
 
         if (pushToTalk)
         {
@@ -103,7 +115,11 @@ public class PressHandler<T> : MonoBehaviour , IPointerDownHandler, IPointerUpHa
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        //if (_anim != null && useFade) _anim.FadeIn(cg);
+        if (useFade) MVCC.animate.FadeIn(cg, new AnimateSettings()
+        {
+            time = 0.1f,
+            fade = 1f
+        });
 
 
         if (pushToTalk)
@@ -132,6 +148,14 @@ public class PressHandler<T> : MonoBehaviour , IPointerDownHandler, IPointerUpHa
             {
                 SoundManager.instance.Play(playSound);
             }
+        }
+    }
+
+    public void ResetDefaultColor()
+    {
+        if (useColor)
+        {
+            imageSelection.color = defaultColor;
         }
     }
 }

@@ -7,14 +7,14 @@ namespace VuforiaSample
     public class Vuforia_MyAnim : IAnimate
     {
 
-        public void FadeOut(CanvasGroup cg, AnimateSettings settings, Action onComplete = null)
+        public void FadeOut(CanvasGroup cg, bool onOut, AnimateSettings settings, Action onComplete = null)
         {
 
             //if (deactivateOnOut)
             //{
             if (!cg.gameObject.activeInHierarchy) return;
             //}
-
+            cg.blocksRaycasts = settings.cgActive;
             cg.gameObject.SetActive(true);
             LeanTween.cancel(cg.gameObject);
 
@@ -23,12 +23,13 @@ namespace VuforiaSample
                 if (onComplete != null)
                     onComplete();
 
-                cg.gameObject.SetActive(false);
+                if (onOut) cg.gameObject.SetActive(false);
             }).setDelay(settings.delay).setEase(settings.tweenType);
         }
 
         public void FadeIn(CanvasGroup cg, AnimateSettings settings, Action onComplete = null) 
         {
+            cg.blocksRaycasts = settings.cgActive;
             cg.gameObject.SetActive(true);
             LeanTween.cancel(cg.gameObject);
 
@@ -42,6 +43,7 @@ namespace VuforiaSample
 
         public void MoveXIn(CanvasGroup cg, AnimateSettings settings, Action onComplete = null)
         {
+            cg.blocksRaycasts = settings.cgActive;
             cg.gameObject.SetActive(true);
             var rectTrans = (RectTransform)cg.gameObject.transform;
             //var v = rectTrans.anchoredPosition;
@@ -76,7 +78,7 @@ namespace VuforiaSample
             {
                 if (!cg.gameObject.activeInHierarchy) return;
             }
-
+            cg.blocksRaycasts = settings.cgActive;
             var rectTrans = (RectTransform)cg.gameObject.transform;
 
             float rectWidth = (toRight) ? rectTrans.rect.width : -rectTrans.rect.width;
@@ -105,7 +107,7 @@ namespace VuforiaSample
             //var v = rectTrans.anchoredPosition;
             //v.x = -Math.Abs(rectTrans.rect.width / 2f);
             //rectTrans.anchoredPosition = v;
-
+            cg.blocksRaycasts = settings.cgActive;
             LeanTween.cancel(cg.gameObject);
             //if (cg != null) LeanTween.alphaCanvas(cg, 1f, speed);
             LeanTween.moveY(rectTrans, settings.animateDistance, settings.time).setDelay(settings.delay).setEase(settings.tweenType).setOnComplete(() =>
@@ -121,7 +123,7 @@ namespace VuforiaSample
             {
                 if (!cg.gameObject.activeInHierarchy) return;
             }
-
+            cg.blocksRaycasts = settings.cgActive;
             var rectTrans = (RectTransform)cg.gameObject.transform;
 
             float rectHeight = (toBottom) ? rectTrans.rect.height : -rectTrans.rect.height;
@@ -147,5 +149,52 @@ namespace VuforiaSample
 
         public void MoveX(CanvasGroup cg, float add, Action onComplete = null, float speed = 0.35f, float delay = 0.1f) { }
         public void MoveY(CanvasGroup cg, float add, Action onComplete = null, float speed = 0.35f, float delay = 0.1f) { }
+
+        public void ScaleOut(CanvasGroup cg, bool onOut, AnimateSettings settings, Action onComplete = null) {
+
+            //if (deactivateOnOut)
+            //{
+            if (!cg.gameObject.activeInHierarchy) return;
+            //}
+
+            LeanTween.cancel(cg.gameObject);
+
+            cg.blocksRaycasts = settings.cgActive;
+
+            LeanTween.scale(cg.gameObject, settings.scale * Vector3.one, settings.time).setOnComplete(() =>
+            {
+                if (onComplete != null)
+                    onComplete();
+
+                if (onOut) cg.gameObject.SetActive(false);
+
+            }).setDelay(settings.delay).setEase(settings.tweenType);
+
+            if (settings.useFade)
+            {
+                LeanTween.alphaCanvas(cg, settings.fade, settings.time).setDelay(settings.delay);
+            }
+        }
+        public void ScaleIn(CanvasGroup cg, AnimateSettings settings, Action onComplete = null)
+        {
+            cg.gameObject.SetActive(true);
+
+            cg.blocksRaycasts = settings.cgActive;
+
+            LeanTween.cancel(cg.gameObject);
+
+            LeanTween.scale(cg.gameObject, settings.scale * Vector3.one, settings.time).setOnComplete(() =>
+            {
+                if (onComplete != null)
+                    onComplete();
+            }).setDelay(settings.delay).setEase(settings.tweenType);
+
+            if (settings.useFade)
+            {
+                LeanTween.alphaCanvas(cg, settings.fade, settings.time).setDelay(settings.delay);
+            }
+
+        }
+
     }
 }

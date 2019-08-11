@@ -15,7 +15,6 @@ namespace VuforiaSample
 
         public void OnPointerDown()
         {
-            Debug.Log("Down");
             app.Notify(onUpEvent, null, false);
         }
 

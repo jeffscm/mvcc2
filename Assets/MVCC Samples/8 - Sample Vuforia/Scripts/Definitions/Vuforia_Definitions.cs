@@ -14,8 +14,8 @@ namespace VuforiaSample
 
     public enum NOTIFYSYSTEM
     {
-        PLAYSOUND,
-        ERROR_MESSAGE
+        NONE,
+        SHOW_TOAST
     }
 
     public enum NOTIFYNAV
@@ -58,8 +58,16 @@ namespace VuforiaSample
         VUFORIA_UI_CLICK_CANCEL,
         VUFORIA_UI_CLICK_DRAWER,
         VUFORIA_UI_CLICK_DRAWER_CLOSE,
-        VUFORIA_OBJ_SELECTED,
-        VUFORIA_OBJ_SELECTED_CLOSE,
-        VUFORIA_OBJ_EDIT,
+        VUFORIA_UI_SHOW_FIRST_OPTIONS,
+        VUFORIA_UI_SHOW_COLORS,
+        VUFORIA_UI_CLICK_RESET,
+        VUFORIA_UI_CLICK_SELECT_COLOR,
+        VUFORIA_UI_OPTIONS_BACK_MAIN,
+
+        VUFORIA_UI_CLICK_PHOTO,
+        VUFORIA_UI_CLICK_START_REC,
+        VUFORIA_UI_CLICK_STOP_REC,
     };
+
+   
 }

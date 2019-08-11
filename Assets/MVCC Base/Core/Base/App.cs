@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum NAVANIM { NONE, FADE, MOVELEFT, MOVERIGHT, MOVEBOTTOM, MOVEUP }
+public enum NAVANIM { NONE, FADE, MOVELEFT, MOVERIGHT, MOVEBOTTOM, MOVEUP, SCALE }
 
 public enum NOTIFY_TYPES 
 { 

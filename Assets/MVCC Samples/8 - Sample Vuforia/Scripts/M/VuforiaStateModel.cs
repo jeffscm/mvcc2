@@ -7,4 +7,6 @@ public class VuforiaStateModel
 
     public string currentPlaceID = string.Empty;
 
+    public POC currentSelection = null;
+
 }

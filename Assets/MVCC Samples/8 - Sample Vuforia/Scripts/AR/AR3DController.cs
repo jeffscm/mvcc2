@@ -7,7 +7,7 @@ namespace VuforiaSample
     public class AR3DController : AppMonoController
     {
         bool _dragEnabled = false;
-        public GameObject target;
+
         bool isMouseDrag = false;
         Vector3 offset;
         Vector3 screenPosition;
@@ -39,12 +39,12 @@ namespace VuforiaSample
                     _currentTarget = null;
 
                     break;
+
                 case NOTIFYVUFORIA.VUFORIA_HIT_TEST:
                     var up = (bool)p_data[0];
                     if (up)
                     {
                         _dragEnabled = false;
-                        target = null;
                     }
                     else
                     {
@@ -54,7 +54,12 @@ namespace VuforiaSample
                             {
                                 if (app.IsCurrentView<SelectView>(-1))
                                 {
-                                    _dragEnabled = true;
+                                    _currentTarget = app.model.GetModel<VuforiaStateModel>().currentSelection?.RealObject ?? null;
+                                    if (_currentTarget != null)
+                                    {
+                                        _down = false;
+                                        _dragEnabled = true;
+                                    }
                                 }
                             }
                         }
@@ -65,15 +70,17 @@ namespace VuforiaSample
             return base.OnNotification(p_event_path, p_target, p_data);
         }
 
-        GameObject ReturnClickedObject(out RaycastHit hit)
+        GameObject ReturnClickedObject()//out RaycastHit hit)
         {
-            GameObject target = null;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray.origin, ray.direction * 10, out hit, 99f, LayerMask.GetMask("Default")))
-            {
-                target = hit.collider.gameObject;
-            }
-            return target;
+            return _currentTarget;
+
+            //GameObject target = null;
+            //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            //if (Physics.Raycast(ray.origin, ray.direction * 10, out hit, 99f, LayerMask.GetMask("Default")))
+            //{
+            //    target = hit.collider.gameObject;
+            //}
+            //return target;
         }
 
 
@@ -81,22 +88,34 @@ namespace VuforiaSample
         {
             if (!_dragEnabled) return;
 
-            if (Input.GetMouseButtonDown(0) && target == null)
+
+            if (Input.touchCount == 2)
             {
-                RaycastHit hitInfo;
-                var temp = ReturnClickedObject(out hitInfo);
+                if (_currentTarget != null)
+                {
+                    RotateObject();
+                }
+                else
+                {
+                    _down = false;
+                }
+                return;
+            }
+
+            _down = false;
+
+            if (Input.GetMouseButtonDown(0) && _currentTarget != null)
+            {
+                //RaycastHit hitInfo;
+                var temp = ReturnClickedObject();//out hitInfo);
 
                 CheckSelectedObject(temp);
 
-                target = temp;
-                if (target != null)
-                {
-                    isMouseDrag = true;
-                    Debug.Log("target position : " + target.transform.position);
-                    //Convert world position to screen position.
-                    screenPosition = Camera.main.WorldToScreenPoint(target.transform.position);
-                    offset = target.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPosition.z));
-                }
+                isMouseDrag = true;
+                Debug.Log("target position : " + _currentTarget.transform.position);
+                //Convert world position to screen position.
+                screenPosition = Camera.main.WorldToScreenPoint(_currentTarget.transform.position);
+                offset = _currentTarget.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPosition.z));
             }
 
             if (Input.GetMouseButtonUp(0))
@@ -104,7 +123,7 @@ namespace VuforiaSample
                 isMouseDrag = false;
             }
 
-            if (isMouseDrag && target != null)
+            if (isMouseDrag && _currentTarget != null)
             {
                 //track mouse position.
                 Vector3 currentScreenSpace = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPosition.z);
@@ -113,8 +132,8 @@ namespace VuforiaSample
                 Vector3 currentPosition = Camera.main.ScreenToWorldPoint(currentScreenSpace) + offset;
 
                 //It will update target gameobject's current postion.
-                currentPosition.y = target.transform.position.y;
-                target.transform.position = currentPosition;
+                currentPosition.y = _currentTarget.transform.position.y;
+                _currentTarget.transform.position = currentPosition;
                 selectionObject.position = currentPosition;
             }
         }
@@ -122,7 +141,7 @@ namespace VuforiaSample
         void CheckSelectedObject(GameObject newSelection)
         {
 
-            Debug.Log($"SELECT: {_currentTarget?.GetInstanceID() ?? -1} {target?.GetInstanceID() ?? -1} {newSelection?.GetInstanceID() ?? -1}");
+            Debug.Log($"SELECT: {_currentTarget?.GetInstanceID() ?? -1} {newSelection?.GetInstanceID() ?? -1}");
 
             var currId = _currentTarget?.GetInstanceID() ?? -1;
             var newId = newSelection?.GetInstanceID() ?? -1;
@@ -130,21 +149,61 @@ namespace VuforiaSample
             if (newSelection == null)
             {
                 selectionObject.gameObject.SetActive(false);
-                _currentTarget = null;
-                app.Notify(NOTIFYVUFORIA.VUFORIA_OBJ_EDIT, null, null);
+                //_currentTarget = null;
+                //app.Notify(NOTIFYVUFORIA.VUFORIA_UI_CLICK_RESET, null, null);
             }
-            else if (currId != newId)
+            else //if (currId != newId)
             {
                 selectionObject.gameObject.SetActive(true);
-                _currentTarget = newSelection;
-                app.Notify(NOTIFYVUFORIA.VUFORIA_OBJ_EDIT, null, _currentTarget);
+                //_currentTarget = newSelection;
+                //app.Notify(NOTIFYVUFORIA.VUFORIA_OBJ_EDIT, null, _currentTarget);
             }
-            else if (currId == newId)
-            {
-                selectionObject.gameObject.SetActive(false);
-                app.Notify(NOTIFYVUFORIA.VUFORIA_OBJ_EDIT, null, null);
-                _currentTarget = null;
-            }
+            //else if (currId == newId)
+            //{
+            //    selectionObject.gameObject.SetActive(false);
+            //    app.Notify(NOTIFYVUFORIA.VUFORIA_OBJ_EDIT, null, null);
+            //    _currentTarget = null;
+            //}
+        }
+
+        bool _down = false;
+
+        float _lastAngleDelta = 0;
+
+        void RotateObject()
+        {
+            Debug.Log("Rotate");
+            var points = GetTouchPositions();
+            var center = (points[1] + points[0]) / 2f;
+            var zero = center - points[0];
+            zero = zero.normalized;
+
+            var angle = Vector2.Angle(new Vector2(1, 0), zero);// * GetLeftMost();
+            var cross = Vector3.Cross(new Vector2(1, 0), zero);
+
+            //Debug.Log(angle);
+
+            if (!_down) _lastAngleDelta = angle;
+            var delta = angle - _lastAngleDelta;
+
+            if (cross.z > 0) delta = delta * -1;
+
+            //Debug.Log($"Delta {angle - _lastAngleDelta} {cross.z}");
+
+            _currentTarget.transform.Rotate(new Vector3(0, delta, 0));
+
+            _lastAngleDelta = angle;
+
+            _down = true;
+        }
+
+        Vector2[] touchPos = new Vector2[2];
+
+        Vector2[] GetTouchPositions()
+        {
+            touchPos[0] = Input.GetTouch(0).position;
+            touchPos[1] = Input.GetTouch(1).position;
+            return touchPos;
         }
     }
 }
