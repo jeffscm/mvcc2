@@ -32,7 +32,7 @@ namespace VuforiaSample
                 app.SwitchNavController<ScanNavController>(CONTROLLER_TYPE.NAV);
             }
 #if UNITY_EDITOR
-            //Invoke(nameof(Test), 2f);
+            Invoke(nameof(Test), 2f);
 #endif
         }
         public override void OnNavigationExit()

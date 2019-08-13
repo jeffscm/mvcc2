@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using System;
 
-public class PressHandler<T> : MonoBehaviour , IPointerDownHandler, IPointerUpHandler 
+public class PressHandler<T> : MonoBehaviour , IPointerDownHandler, IPointerUpHandler
 {
     public bool useFade = false;
 
