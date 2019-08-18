@@ -34,7 +34,6 @@ public class UIViewAnim : AppElement
     public void DoAnimateIn()
     {
         onAnimateIn?.Invoke();
-        Debug.Log($"Anim in {animateIn.animateType}");
         switch (animateIn.animateType)
         {
             case NAVANIM.FADE:
@@ -83,26 +82,46 @@ public class UIViewAnim : AppElement
 #if UNITY_EDITOR
     public void SetDefaultOut()
     {
+
+        var rectTrans = this.transform as RectTransform;
+        var rectSize = 0f;
+        var f = 0f;
+        var v = rectTrans.anchoredPosition;
+
         switch (animateOut.animateType)
         {
             case NAVANIM.FADE:
                 cg.alpha = animateOut.fade;
 
                 break;
+
             case NAVANIM.MOVELEFT:
+                rectSize = -rectTrans.rect.width;
+                f = (animateOut.animateDistance == 0f) ? rectSize : animateOut.animateDistance;
+                v.x = f;
                 break;
             case NAVANIM.MOVERIGHT:
+                rectSize = rectTrans.rect.width;
+                f = (animateOut.animateDistance == 0f) ? rectSize : animateOut.animateDistance;
+                v.x = f;
                 break;
             case NAVANIM.MOVEBOTTOM:
+                rectSize = -rectTrans.rect.height;
+                f = (animateOut.animateDistance == 0f) ? rectSize : animateOut.animateDistance;
+                v.y = f;
                 break;
             case NAVANIM.MOVEUP:
+                rectSize = rectTrans.rect.height;
+                f = (animateOut.animateDistance == 0f) ? rectSize : animateOut.animateDistance;
+                v.y = f;
+
                 break;
             case NAVANIM.SCALE:
                 this.transform.localScale = animateOut.scale * Vector3.one;
                 if (animateOut.useFade) cg.alpha = animateOut.fade;
                 break;
         }
-
+        rectTrans.anchoredPosition = v;
         cg.blocksRaycasts = animateOut.cgActive;
     }
 #endif

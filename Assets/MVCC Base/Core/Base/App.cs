@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum NAVANIM { NONE, FADE, MOVELEFT, MOVERIGHT, MOVEBOTTOM, MOVEUP, SCALE }
+public enum NAVANIM { NONE, FADE, MOVELEFT, MOVERIGHT, MOVEBOTTOM, MOVEUP, SCALE, NO_ANIM }
 
 public enum NOTIFY_TYPES 
 { 
@@ -270,7 +270,6 @@ public class App
     {
         foreach (var view in uiviewList)
         {
-            Debug.Log($"IsCurrent: {view.Value.gameObject.name} {view.Value.IsCurrent}");
             if (view.Value != null && (view.Value.controllerId == controllerId || controllerId == -1) && view.Value.IsCurrent)
             {
                 return view.Key == typeof(T);

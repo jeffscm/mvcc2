@@ -26,13 +26,11 @@ public class UIView : AppElement, IUIView
 
     public void Present()
     {
-        Debug.Log($"This UIView {IsCurrent}");
         app.HideViews(this, controllerId);
         navAnimate?.AnimateIn( () => {
             OnPresent?.Invoke();
         });
         IsCurrent = true;
-
     }
 
     public void Dismiss()

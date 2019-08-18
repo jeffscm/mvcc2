@@ -42,6 +42,22 @@ public class NavAnimate : MonoBehaviour, INavAnimate
             case NAVANIM.MOVERIGHT:
                 MVCC.animate.MoveXIn(cg, animateIn, onComplete);
                 break;
+            case NAVANIM.NO_ANIM:
+                this.gameObject.SetActive(true);
+                LeanTween.cancel(this.gameObject);
+                if (animateIn.delay > 0f)
+                {
+                    LeanTween.value(0f, 1f, animateIn.delay).setOnComplete(() =>
+                    {
+                        onComplete?.Invoke();
+                    });
+                }
+                else
+                {
+                    onComplete?.Invoke();
+                }
+
+                break;
         }
     }
 
@@ -64,12 +80,36 @@ public class NavAnimate : MonoBehaviour, INavAnimate
             case NAVANIM.MOVEUP:
                 MVCC.animate.MoveYOut(cg, deactivateOnOut, animateOut, false, onComplete);
                 break;
+            case NAVANIM.NO_ANIM:
 
+                LeanTween.cancel(this.gameObject);
+                if (animateOut.delay > 0f)
+                {
+                    LeanTween.value(0f, 1f, animateOut.delay).setOnComplete(() =>
+                    {
+                        onComplete?.Invoke();
+                        if (deactivateOnOut)
+                        {
+                            this.gameObject.SetActive(false);
+                        }
+                    });
+                }
+                else
+                {
+                    onComplete?.Invoke();
+                    if (deactivateOnOut)
+                    {
+                        this.gameObject.SetActive(false);
+                    }
+                }
+                break;
         }
     }
 
     public virtual void AnimateOutInstant()
     {
+        if (!_hasMinMax) return;
+
         MVCC.animate.MoveXOutInstant(cg);
     }
 
@@ -107,6 +147,15 @@ public class NavAnimate : MonoBehaviour, INavAnimate
                     f = (animateOut.animateDistance == 0f) ? rectSize : animateOut.animateDistance;
                     v.y = f;
                     break;
+                case NAVANIM.FADE:
+
+                    break;
+                case NAVANIM.SCALE:
+
+                    break;
+                case NAVANIM.NO_ANIM:
+
+                    break;
             }
 
             rectTrans.anchoredPosition = v;
@@ -115,6 +164,7 @@ public class NavAnimate : MonoBehaviour, INavAnimate
                 this.gameObject.SetActive(false);
             }
         }
+       
         onComplete?.Invoke();
     }
 
@@ -163,6 +213,10 @@ public class AnimateSettings
     //public bool useScale = false;
     public float scale = 0f;
     public bool cgActive = true;
+
+    //todo
+    //public bool useScreenSize = false;
+
 }
 
 [Serializable] 

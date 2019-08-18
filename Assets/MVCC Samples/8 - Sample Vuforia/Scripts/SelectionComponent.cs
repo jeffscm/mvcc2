@@ -53,6 +53,8 @@ namespace VuforiaSample
 
         float _drag = 0f;
         bool _dragValue = false;
+        bool _pressed = false;
+        float _lastDelta = 0f;
 
         public float startAngle, initialAngle, endAngle;
 
@@ -89,17 +91,22 @@ namespace VuforiaSample
             {
                 var e = this.transform.localEulerAngles;
 
-                if (Mathf.Abs(eventData.delta.y) > Mathf.Abs(eventData.delta.x))
-                {
-                    e.z += eventData.delta.y;
-                    _drag = Mathf.Clamp(eventData.delta.y, -1f, 1f);
-                }
-                else
-                {
-                    e.z += -eventData.delta.x;
-                    _drag = -Mathf.Clamp(eventData.delta.x, -1f, 1f);
-                }
-                Debug.Log($"EZ: {e.z}");
+
+                var v = eventData.position.normalized - (this.transform as RectTransform).anchoredPosition.normalized;
+
+                var angle = Vector2.Angle(v, Vector2.right);
+                var cross = Vector3.Cross(v, Vector2.right);
+
+                Debug.Log($"A: {angle} {cross} {_lastDelta}");
+
+                var delta = angle - _lastDelta;
+
+                if (cross.z > 0) delta *= -1f;
+
+                e.z += delta;
+
+                _lastDelta = delta;
+
                 if (!(e.z > startAngle && e.z < endAngle))
                 {
                     _dragValue = false;
@@ -132,11 +139,18 @@ namespace VuforiaSample
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            //_pressed = true;
+            if (!_pressed)
+            {
+                //var v = eventData.position.normalized;
+                //var angle = Vector2.Angle(v, Vector2.right);
+                //var cross = Vector3.Cross(v, Vector2.right);
+                //_lastDelta = angle;
+            }
+            _pressed = true;
         }
         public void OnPointerUp(PointerEventData eventData)
         {
-            //_pressed = false;
+            _pressed = false;
         }
                
     }

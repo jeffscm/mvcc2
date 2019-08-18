@@ -25,7 +25,10 @@ namespace VuforiaSample
         void OnScanState(bool state)
         {
             Debug.Log($"Status Scan {state}");
-            //selectionObject.gameObject.SetActive(state);
+
+
+
+
         }
 
 

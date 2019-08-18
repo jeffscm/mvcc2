@@ -169,7 +169,6 @@ namespace VuforiaSample
             StatusInfoCached = statusInfo;
             _vuforiaState.state = StatusCached;
 
-            var currentStatus = TrackingStatusIsTrackedAndNormal;
             CancelInvoke(nameof(ProcessCurrentStatus));
             if (!TrackingStatusIsTrackedAndNormal)
             {
